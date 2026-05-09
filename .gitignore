@@ -1,0 +1,9 @@
+data/
+
+reconstruction.mp4
+model/models/
+model/test.jpeg
+
+# pycache
+model/__pycache__/
+__pycache__/
