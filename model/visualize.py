@@ -10,7 +10,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 MODEL_PATH = "model/models/nca.pth"
 TEST_IMG = "model/test.jpeg"
 
-def load_image(path, size=64):
+def load_image(path, size=120):
     img = Image.open(path).convert("RGB").resize((size, size))
     img = np.array(img) / 255.0
     img = torch.tensor(img).permute(2,0,1).float()

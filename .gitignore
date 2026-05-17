@@ -3,7 +3,15 @@ data/
 reconstruction.mp4
 model/models/
 model/test.jpeg
+model/test.png
+model/test.jpg
+data2/
+.vscode/
 
 # pycache
 model/__pycache__/
 __pycache__/
+
+#virtual environment
+venv/
+env/
