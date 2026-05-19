@@ -7,7 +7,7 @@ from nca import NCA
 from masking import random_mask_batch
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-MODEL_PATH = "model/models/nca.pth"
+MODEL_PATH = "model/models/nca(10).pth"
 TEST_IMG = "model/test.jpeg"
 
 def load_image(path, size=120):

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Autómata Celular - Reconstrucción</title>
+<style>
+html, body {
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    background:#111;
+    color:#fff;
+    overflow:hidden;
+    font-family: Arial, sans-serif;
+}
+#container {
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    height:100%;
+}
+#topbar {
+    padding:10px;
+    text-align:center;
+}
+#canvases {
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+}
+canvas {
+    border:2px solid #444;
+    width:45vw;
+    height:45vw;
+    max-width:600px;
+    max-height:600px;
+    image-rendering: pixelated;
+}
+button, input {
+    padding:8px 14px;
+    margin:5px;
+}
+</style>
+</head>
+<body>
+<div id="container">
+    <div id="topbar">
+        <input type="file" id="upload">
+        <button onclick="clearMask()">Borrar máscara</button>
+    </div>
+    <div id="canvases">
+        <canvas id="canvas" width="120" height="120"></canvas>
+        <canvas id="result" width="120" height="120"></canvas>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const resultCanvas = document.getElementById('result');
+const resultCtx = resultCanvas.getContext('2d');
+
+let img = new Image();
+let drawing = false;
+let mask = Array(120).fill(0).map(()=>Array(120).fill(1));
+let lastSend = 0;
+
+document.getElementById('upload').onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        img.onload = () => {
+            ctx.drawImage(img,0,0,120,120);
+            resetMask();
+            reconstruct();
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
+canvas.onmousedown = () => drawing = true;
+canvas.onmouseup = () => drawing = false;
+
+canvas.onmousemove = e => {
+    if (!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) * 120 / rect.width);
+    const y = Math.floor((e.clientY - rect.top) * 120 / rect.height);
+    ctx.fillStyle = "black";
+    ctx.fillRect(x-3,y-3,7,7);
+    for(let i=-3;i<=3;i++){
+        for(let j=-3;j<=3;j++){
+            const xx = x+i, yy = y+j;
+            if(xx>=0 && yy>=0 && xx<120 && yy<120){
+                mask[yy][xx]=0;
+            }
+        }
+    }
+    const now = Date.now();
+    if (now - lastSend > 150) {
+        lastSend = now;
+        reconstruct();
+    }
+};
+
+function resetMask(){
+    mask = Array(120).fill(0).map(()=>Array(120).fill(1));
+}
+
+function clearMask(){
+    if(img.src) ctx.drawImage(img,0,0,120,120);
+    resetMask();
+    reconstruct();
+}
+
+async function reconstruct(){
+    if(!img.src) return;
+    const dataURL = canvas.toDataURL("image/png");
+
+    const res = await fetch("/reconstruct", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({image:dataURL, mask:mask})
+    });
+
+    const data = await res.json();
+    let out = new Image();
+    out.onload = () => {
+        resultCtx.clearRect(0,0,120,120);
+        resultCtx.drawImage(out,0,0,120,120);
+    };
+    out.src = data.image;
+}
+</script>
+</body>
+</html>
