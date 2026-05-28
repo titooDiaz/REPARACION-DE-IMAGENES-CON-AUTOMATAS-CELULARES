@@ -1,5 +1,7 @@
 <img width="1584" height="672" alt="Project image" src="https://github.com/user-attachments/assets/29c097ec-36c1-470e-a601-46cdb8032806" />
 
+## Link to video tutorial: https://youtu.be/BKQoahnVlPs
+
 ## How to Use
 
 1. **Download the dataset**
