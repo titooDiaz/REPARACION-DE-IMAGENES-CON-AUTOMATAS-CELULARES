@@ -10,7 +10,7 @@ from model.nca import NCA
 app = Flask(__name__)
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-MODEL_PATH = "model/models/nca(8).pth"
+MODEL_PATH = "REPARACION-DE-IMAGENES-CON-AUTOMATAS-CELULARES-main/model/nca.pth"
 IMG_SIZE = 120
 
 model = NCA().to(DEVICE)
